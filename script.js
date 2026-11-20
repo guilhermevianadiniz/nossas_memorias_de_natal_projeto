@@ -1,7 +1,7 @@
 (() => {
   const PHOTO_JUMP = 'assets/foto_embutida_1.jpg';
-  // Hash SHA-256 da data de logon (13/07/2024 -> números '13072024')
-  const AUTH_DATE_HASH = '6c5000a6073cca78ad8bc0afba7723b691a7dd176d16d0c42fad0aa492867c60';
+  // Hash SHA-256 da senha especial de Natal: currybox123
+  const XMAS_PASS_HASH = '6b248677bc5360e616077ef96b44a8028f744eb45e6a8d8a3105eb1117187354';
 
   const content = document.getElementById('content');
   const progress = document.getElementById('progress');
@@ -11,6 +11,7 @@
   let step = 0;
   let collected = [false,false,false];
   let extraPhotos = {penedo:'assets/penedo.jpeg',park:'assets/park.jpeg'};
+  let countdownTimer = null;
 
   async function sha256(t){
     const d=new TextEncoder().encode(t);
@@ -38,57 +39,97 @@
 
   function setProgress(label, value){counter.textContent=label;progress.style.width=value+'%';}
 
-  function renderLogin(){
-    setProgress('Acesso Restrito', 0);
+  function renderCountdown(){
+    setProgress('Presente Misterioso 🎁', 0);
+    
+    // Alvo: 25 de Dezembro às 00:00:00
+    const now = new Date();
+    const targetYear = (now.getMonth() === 11 && now.getDate() >= 25) ? now.getFullYear() + 1 : now.getFullYear();
+    const targetDate = new Date(targetYear, 11, 25, 0, 0, 0);
+
     content.innerHTML = `
       <div style="text-align:center">
-        <span class="eyebrow">🔐 momento especial</span>
-        <h1>Um cantinho só nosso...</h1>
-        <div class="scene" style="max-width:360px;margin:16px auto;padding:22px 18px;background:#fff2eb;border:2px dashed #e6bcb3;border-radius:24px;">
-          <span style="font-size:48px;display:block;margin-bottom:10px">🔒</span>
-          <p style="margin:0;font-size:15px;color:#785d61;font-weight:700;line-height:1.5">
-            Para viajar pelas nossas lembranças de Natal, responda à pergunta mágica:
+        <span class="eyebrow">🎄 Encomenda Especial</span>
+        <h1>Chegou mais cedo...</h1>
+        <div class="scene" style="max-width:420px;margin:16px auto;padding:22px 16px;background:#fff4ee;border:2px dashed #e6bcb3;border-radius:24px;">
+          <span style="font-size:52px;display:block;margin-bottom:8px">🎁</span>
+          <p style="margin:0 0 12px;font-size:15px;color:#785d61;font-weight:700;line-height:1.5">
+            Um presente feito com todo amor do mundo está esperando por você!
+          </p>
+          <div class="countdown-grid">
+            <div class="countdown-box">
+              <div class="countdown-num" id="cdDays">00</div>
+              <div class="countdown-label">Dias</div>
+            </div>
+            <div class="countdown-box">
+              <div class="countdown-num" id="cdHours">00</div>
+              <div class="countdown-label">Horas</div>
+            </div>
+            <div class="countdown-box">
+              <div class="countdown-num" id="cdMins">00</div>
+              <div class="countdown-label">Min</div>
+            </div>
+            <div class="countdown-box">
+              <div class="countdown-num" id="cdSecs">00</div>
+              <div class="countdown-label">Seg</div>
+            </div>
+          </div>
+          <p style="margin:12px 0 0;font-size:12px;color:#8f7579;font-weight:700">
+            A entrega oficial acontece no dia 25 de Dezembro! 🎅
           </p>
         </div>
-        <div class="quote" style="font-style:normal;font-size:clamp(19px,4.5vw,24px);font-weight:1000;color:#b94e60;margin:16px auto">
-          Qual é a nossa data? ❤️
+        <div class="quote" style="font-style:normal;font-size:clamp(16px,4vw,19px);font-weight:800;color:#b94e60;margin:14px auto">
+          Quer abrir antes? Digite a senha mágica: ✨
         </div>
         <div class="password-wrap">
-          <input id="loginDate" type="text" inputmode="numeric" autocomplete="off" placeholder="DD/MM/AAAA" maxlength="10" aria-label="Nossa data">
-          <p class="feedback" id="loginFeedback" aria-live="polite"></p>
+          <input id="passInput" type="text" autocomplete="off" autocapitalize="none" placeholder="Digite a senha mágica..." aria-label="Senha de Natal">
+          <p class="feedback" id="passFeedback" aria-live="polite"></p>
         </div>
         <div class="actions">
-          <button class="btn" id="loginBtn">Entrar na nossa história ✨</button>
+          <button class="btn" id="openBtn">Abrir meu presente 🔓❤️</button>
         </div>
       </div>
     `;
 
-    const input = document.getElementById('loginDate');
-    input.addEventListener('input', (e) => {
-      let v = e.target.value.replace(/\D/g, '').slice(0, 8);
-      if (v.length >= 5) {
-        v = v.replace(/(\d{2})(\d{2})(\d{0,4})/, '$1/$2/$3');
-      } else if (v.length >= 3) {
-        v = v.replace(/(\d{2})(\d{0,2})/, '$1/$2');
-      }
-      e.target.value = v;
-    });
+    const daysEl = document.getElementById('cdDays');
+    const hoursEl = document.getElementById('cdHours');
+    const minsEl = document.getElementById('cdMins');
+    const secsEl = document.getElementById('cdSecs');
 
-    const checkLogin = async () => {
-      const raw = input.value.replace(/\D/g, '');
-      const h = await sha256(raw);
-      if (h === AUTH_DATE_HASH) {
+    function updateTimer() {
+      const diff = Math.max(0, targetDate - new Date());
+      const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const m = Math.floor((diff / (1000 * 60)) % 60);
+      const s = Math.floor((diff / 1000) % 60);
+      if (daysEl) daysEl.textContent = String(d).padStart(2, '0');
+      if (hoursEl) hoursEl.textContent = String(h).padStart(2, '0');
+      if (minsEl) minsEl.textContent = String(m).padStart(2, '0');
+      if (secsEl) secsEl.textContent = String(s).padStart(2, '0');
+    }
+    updateTimer();
+    if (countdownTimer) clearInterval(countdownTimer);
+    countdownTimer = setInterval(updateTimer, 1000);
+
+    const input = document.getElementById('passInput');
+    const checkPass = async () => {
+      const val = input.value.trim().toLowerCase();
+      const h = await sha256(val);
+      const diff = targetDate - new Date();
+      if (h === XMAS_PASS_HASH || diff <= 0) {
+        if (countdownTimer) clearInterval(countdownTimer);
+        sessionStorage.setItem('natal_auth', 'true');
         window.scrollTo({top:0,behavior:'smooth'});
         renderIntro();
       } else {
-        document.getElementById('loginFeedback').textContent = 'Hum, essa não é a nossa data... Tenta de novo! ❤️';
+        document.getElementById('passFeedback').textContent = 'Ainda não é essa senha... Pergunte para o seu amor no dia 25! ❤️';
         input.focus();
       }
     };
 
-    document.getElementById('loginBtn').addEventListener('click', checkLogin);
+    document.getElementById('openBtn').addEventListener('click', checkPass);
     input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') checkLogin();
+      if (e.key === 'Enter') checkPass();
     });
     input.focus();
   }
@@ -147,5 +188,9 @@
     document.getElementById('again').addEventListener('click',()=>{window.scrollTo({top:0,behavior:'smooth'});step=0;renderIntro()});
   }
 
-  renderLogin();
+  if (sessionStorage.getItem('natal_auth') === 'true') {
+    renderIntro();
+  } else {
+    renderCountdown();
+  }
 })();

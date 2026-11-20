@@ -47,6 +47,10 @@ h2{font-size:clamp(23px,5vw,32px);line-height:1.1;color:#b94e60;margin:12px 0}
 .password-wrap{max-width:360px;margin:18px auto}
 .password-wrap input{width:100%;min-height:52px;border:2px solid #e7c8ba;border-radius:14px;padding:12px 14px;text-align:center;font-size:17px;color:#604a50;background:#fff}
 .feedback{min-height:22px;margin:8px 0 0;text-align:center;font-size:13px;font-weight:900;color:#b94e60}
+.countdown-grid{display:flex;justify-content:center;gap:8px;margin:16px auto;max-width:380px}
+.countdown-box{background:#fff;border:2px solid #eed6cc;border-radius:16px;padding:8px 10px;min-width:62px;box-shadow:0 4px 12px #76505b10;text-align:center}
+.countdown-num{font-size:clamp(20px,5.2vw,28px);font-weight:1000;color:var(--rose);line-height:1}
+.countdown-label{font-size:10px;font-weight:800;color:#8c7377;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
 .final-art{max-width:650px;margin:10px auto 18px}
 .footer{padding:13px 18px 16px;text-align:center;color:#9a8181;font-size:11px}
 .footer b{color:#b65b68}
