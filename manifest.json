@@ -1,0 +1,11 @@
+{
+  "name": "Nossas Memórias de Natal",
+  "short_name": "Memórias ❤️",
+  "description": "Uma aventura só nossa — memórias do nosso Natal",
+  "start_url": "index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fff5ed",
+  "theme_color": "#fff5ed",
+  "icons": []
+}

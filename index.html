@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fff5ed">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:;">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎄</text></svg>">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Nossas Memórias de Natal ❤️</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="snow" id="snow" aria-hidden="true"></div>
+<main class="app">
+  <div class="top">
+    <div class="brand">🎄 Nossas Memórias <small>uma aventura só nossa</small></div>
+    <div class="counter" id="counter">Começo da história</div>
+  </div>
+  <section class="book" aria-live="polite">
+    <div class="progress"><span id="progress"></span></div>
+    <div class="content" id="content"></div>
+    <div class="footer">Feito com carinho, para guardar um pouquinho da nossa história <b>♥</b></div>
+  </section>
+</main>
+<script src="script.js" defer></script>
+</body>
+</html>

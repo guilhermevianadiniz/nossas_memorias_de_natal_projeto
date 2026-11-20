@@ -1,0 +1,16 @@
+PROJETO: Nossas Memórias de Natal
+
+ARQUIVOS
+- index.html: estrutura e conteúdo da página.
+- style.css: cores, layout e aparência.
+- script.js: lógica do jogo e botões.
+- assets/: imagens incorporadas ao projeto.
+
+COMO EDITAR
+1. Extraia esta pasta do ZIP.
+2. Abra a pasta no Visual Studio Code (Arquivo > Abrir Pasta).
+3. Edite os arquivos acima.
+4. Para testar, abra index.html em um navegador. Se usar a extensão Live Server, clique em Go Live.
+5. Mantenha os nomes e a estrutura da pasta assets ao alterar imagens.
+
+O projeto foi separado em HTML, CSS e JavaScript para facilitar futuras modificações.
