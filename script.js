@@ -74,7 +74,7 @@
               <div class="countdown-label">Seg</div>
             </div>
           </div>
-          <p style="margin:12px 0 0;font-size:12px;color:#8f7579;font-weight:700">
+          <p id="cdNote" style="margin:12px 0 0;font-size:12px;color:#8f7579;font-weight:700">
             A entrega oficial acontece no dia 25 de Dezembro! 🎅
           </p>
         </div>
@@ -97,7 +97,16 @@
     const secsEl = document.getElementById('cdSecs');
 
     function updateTimer() {
-      const diff = Math.max(0, targetDate - new Date());
+      const diff = targetDate - new Date();
+      if (diff <= 0) {
+        if (daysEl) daysEl.textContent = '00';
+        if (hoursEl) hoursEl.textContent = '00';
+        if (minsEl) minsEl.textContent = '00';
+        if (secsEl) secsEl.textContent = '00';
+        const note = document.getElementById('cdNote');
+        if (note) note.textContent = 'É Natal! 🎅 Digite a senha que seu amor te deu para abrir:';
+        return;
+      }
       const d = Math.floor(diff / (1000 * 60 * 60 * 24));
       const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
       const m = Math.floor((diff / (1000 * 60)) % 60);
@@ -115,8 +124,8 @@
     const checkPass = async () => {
       const val = input.value.trim().toLowerCase();
       const h = await sha256(val);
-      const diff = targetDate - new Date();
-      if (h === XMAS_PASS_HASH || diff <= 0) {
+      // Exige SEMPRE a senha correta (currybox123) para garantir total privacidade
+      if (h === XMAS_PASS_HASH) {
         if (countdownTimer) clearInterval(countdownTimer);
         sessionStorage.setItem('natal_auth', 'true');
         window.scrollTo({top:0,behavior:'smooth'});
