@@ -1,5 +1,8 @@
 (() => {
   const PHOTO_JUMP = 'assets/foto_embutida_1.jpg';
+  // Hash SHA-256 da data de logon (13/07/2024 -> números '13072024')
+  const AUTH_DATE_HASH = '6c5000a6073cca78ad8bc0afba7723b691a7dd176d16d0c42fad0aa492867c60';
+
   const content = document.getElementById('content');
   const progress = document.getElementById('progress');
   const counter = document.getElementById('counter');
@@ -8,6 +11,12 @@
   let step = 0;
   let collected = [false,false,false];
   let extraPhotos = {penedo:'assets/penedo.jpeg',park:'assets/park.jpeg'};
+
+  async function sha256(t){
+    const d=new TextEncoder().encode(t);
+    const h=await crypto.subtle.digest('SHA-256',d);
+    return[...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join('');
+  }
 
   for(let i=0;i<22;i++){
     const flake=document.createElement('i');
@@ -28,6 +37,62 @@
   };
 
   function setProgress(label, value){counter.textContent=label;progress.style.width=value+'%';}
+
+  function renderLogin(){
+    setProgress('Acesso Restrito', 0);
+    content.innerHTML = `
+      <div style="text-align:center">
+        <span class="eyebrow">🔐 momento especial</span>
+        <h1>Um cantinho só nosso...</h1>
+        <div class="scene" style="max-width:360px;margin:16px auto;padding:22px 18px;background:#fff2eb;border:2px dashed #e6bcb3;border-radius:24px;">
+          <span style="font-size:48px;display:block;margin-bottom:10px">🔒</span>
+          <p style="margin:0;font-size:15px;color:#785d61;font-weight:700;line-height:1.5">
+            Para viajar pelas nossas lembranças de Natal, responda à pergunta mágica:
+          </p>
+        </div>
+        <div class="quote" style="font-style:normal;font-size:clamp(19px,4.5vw,24px);font-weight:1000;color:#b94e60;margin:16px auto">
+          Qual é a nossa data? ❤️
+        </div>
+        <div class="password-wrap">
+          <input id="loginDate" type="text" inputmode="numeric" autocomplete="off" placeholder="DD/MM/AAAA" maxlength="10" aria-label="Nossa data">
+          <p class="feedback" id="loginFeedback" aria-live="polite"></p>
+        </div>
+        <div class="actions">
+          <button class="btn" id="loginBtn">Entrar na nossa história ✨</button>
+        </div>
+      </div>
+    `;
+
+    const input = document.getElementById('loginDate');
+    input.addEventListener('input', (e) => {
+      let v = e.target.value.replace(/\D/g, '').slice(0, 8);
+      if (v.length >= 5) {
+        v = v.replace(/(\d{2})(\d{2})(\d{0,4})/, '$1/$2/$3');
+      } else if (v.length >= 3) {
+        v = v.replace(/(\d{2})(\d{0,2})/, '$1/$2');
+      }
+      e.target.value = v;
+    });
+
+    const checkLogin = async () => {
+      const raw = input.value.replace(/\D/g, '');
+      const h = await sha256(raw);
+      if (h === AUTH_DATE_HASH) {
+        window.scrollTo({top:0,behavior:'smooth'});
+        renderIntro();
+      } else {
+        document.getElementById('loginFeedback').textContent = 'Hum, essa não é a nossa data... Tenta de novo! ❤️';
+        input.focus();
+      }
+    };
+
+    document.getElementById('loginBtn').addEventListener('click', checkLogin);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') checkLogin();
+    });
+    input.focus();
+  }
+
   function renderIntro(){
     setProgress('O começo de tudo',0);
     content.innerHTML=`<div style="text-align:center"><span class="eyebrow">💌 capítulo especial</span><h1>Antes das aventuras…<br>teve a gente.</h1><img class="memory-photo" src="assets/inicio.jpeg" alt="Nós dois"><p class="lead">Tudo começou com uma mensagem no Instagram. <strong>Você tomou a iniciativa e me chamou para te encontrar.</strong> A gente sempre foi unido, mas aquele começo teve um jeitinho muito especial.</p><div class="quote">E foi assim que começaram algumas das lembranças que eu mais gosto de guardar. ❤️</div><div class="actions"><button class="btn" id="begin">Viajar pelas nossas memórias ✨</button></div></div>`;
@@ -61,7 +126,17 @@
     setProgress('O presente de verdade',85);
     content.innerHTML=`<div style="text-align:center"><span class="eyebrow">🎁 capítulo final</span><h1>As melhores memórias nós já criamos…</h1><div class="final-art">${art.final}</div><p class="lead">Mas o seu presente de verdade está aqui. <strong>Diga a senha mágica para abrir:</strong></p><div class="quote" style="font-style:normal;font-size:clamp(19px,4.6vw,25px);font-weight:1000;color:#b94e60">Feliz Natal, meu amor!</div><div class="password-wrap"><input id="password" type="text" inputmode="text" autocomplete="off" autocapitalize="sentences" placeholder="Digite a senha mágica" aria-label="Senha mágica"><p class="feedback" id="feedback" aria-live="polite"></p></div><div class="actions"><button class="btn" id="unlock">Abrir meu presente 🎄</button></div></div>`;
     const input=document.getElementById('password');
-    async function sha256(t){const d=new TextEncoder().encode(t);const h=await crypto.subtle.digest('SHA-256',d);return[...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join('')}const unlock=async()=>{const value=input.value.trim().toLocaleLowerCase('pt-BR').replace(/\s+/g,' ');const h=await sha256(value);if(h==='335187b0ac6be7a856eca2f9ff261e89d1f19a994fb044322d94329e06aa85d4'||h==='694ea712c97998d0d1a814d40b7c08429e873b8dfc95c1da283d38949d64064e'){step=5;renderUnlocked()}else{document.getElementById('feedback').textContent='Quase! Tente a frase que apareceu ali em cima. 💁';input.focus()}};
+    const unlock=async()=>{
+      const value=input.value.trim().toLocaleLowerCase('pt-BR').replace(/\s+/g,' ');
+      const h=await sha256(value);
+      if(h==='335187b0ac6be7a856eca2f9ff261e89d1f19a994fb044322d94329e06aa85d4'||h==='694ea712c97998d0d1a814d40b7c08429e873b8dfc95c1da283d38949d64064e'){
+        step=5;
+        renderUnlocked();
+      }else{
+        document.getElementById('feedback').textContent='Quase! Tente a frase que apareceu ali em cima. 💁';
+        input.focus();
+      }
+    };
     document.getElementById('unlock').addEventListener('click',unlock);
     input.addEventListener('keydown',e=>{if(e.key==='Enter')unlock()});
   }
@@ -71,5 +146,6 @@
     content.innerHTML=`<div style="text-align:center"><span class="eyebrow">💗 feliz Natal!</span><h1>O nosso Pote do Amor</h1><div class="final-art">${art.final}</div><p class="lead">Este pote guarda <strong>365 motivos</strong>, um para cada dia do ano.</p><div class="quote">As melhores memórias nós já criamos. E ainda tem tanta coisa boa esperando pela gente…</div><p class="story"><strong>Agora é hora de entregar o Pote do Amor de verdade! ❤️</strong></p><div class="actions"><button class="btn green" id="again">Rever nossa história ↺</button></div></div>`;
     document.getElementById('again').addEventListener('click',()=>{window.scrollTo({top:0,behavior:'smooth'});step=0;renderIntro()});
   }
-  renderIntro();
+
+  renderLogin();
 })();
