@@ -159,16 +159,13 @@
     const m=memories[step-1];
     collected=[false,false,false];
     setProgress(`Memória ${step} de 3 · ${m.label}`,step*20);
-    const photo = m.key==='jump' && PHOTO_JUMP ? `<img class="memory-photo" loading="lazy" decoding="async" src="${PHOTO_JUMP}" alt="Fotos do nosso dia no Jump Land">` : (extraPhotos[m.key] ? `<img class="memory-photo" loading="lazy" decoding="async" id="extraPreview" src="${extraPhotos[m.key]}" alt="Foto adicionada desta lembrança">` : '');
-    const addPhoto = m.key!=='jump' ? `<label class="photo-add">📷 Adicionar uma foto desta lembrança<input type="file" accept="image/*" id="photoPick"></label><p class="photo-note">Opcional: escolha uma foto do rolo da câmera.</p>` : `<p class="photo-note">Um pedacinho do nosso dia guardado em fotos. 💜</p>`;
-    content.innerHTML=`<div style="text-align:center"><span class="eyebrow">${m.emoji} ${m.label}</span><h2>${m.title}</h2>${photo ? '' : '<div class="scene">'+m.art+'</div>'}${photo}${addPhoto}<p class="story">${m.text}</p><div class="quote">“${m.quote}”</div><div class="token-area"><div class="token-title">Toque nos 3 símbolos para desbloquear a próxima lembrança</div><div class="tokens">${m.token.map((t,i)=>`<button class="token" data-token="${i}" aria-label="Encontrar lembrança ${i+1}">${t}</button>`).join('')}</div><p class="token-status" id="tokenStatus">0 de 3 lembranças encontradas</p></div><div class="actions"><button class="btn green hidden" id="nextMemory">Continuar nossa aventura ❤️</button></div></div>`;
+    const photo = m.key==='jump' && PHOTO_JUMP ? `<img class="memory-photo" loading="lazy" decoding="async" src="${PHOTO_JUMP}" alt="Fotos do nosso dia no Jump Land">` : (extraPhotos[m.key] ? `<img class="memory-photo" loading="lazy" decoding="async" src="${extraPhotos[m.key]}" alt="Foto de ${m.label}">` : '');
+    content.innerHTML=`<div style="text-align:center"><span class="eyebrow">${m.emoji} ${m.label}</span><h2>${m.title}</h2>${photo ? '' : '<div class="scene">'+m.art+'</div>'}${photo}<p class="story">${m.text}</p><div class="quote">“${m.quote}”</div><div class="token-area"><div class="token-title">Toque nos 3 símbolos para desbloquear a próxima lembrança</div><div class="tokens">${m.token.map((t,i)=>`<button class="token" data-token="${i}" aria-label="Encontrar lembrança ${i+1}">${t}</button>`).join('')}</div><p class="token-status" id="tokenStatus">0 de 3 lembranças encontradas</p></div><div class="actions"><button class="btn green hidden" id="nextMemory">Continuar nossa aventura ❤️</button></div></div>`;
     content.querySelectorAll('[data-token]').forEach(btn=>btn.addEventListener('click',()=>{
       const i=Number(btn.dataset.token); if(collected[i]) return; collected[i]=true; btn.classList.add('done'); btn.innerHTML='<span>✓</span>'; btn.disabled=true;
       const count=collected.filter(Boolean).length; document.getElementById('tokenStatus').textContent=`${count} de 3 lembranças encontradas`;
       if(count===3){document.getElementById('tokenStatus').textContent='Memória desbloqueada! ✨';document.getElementById('nextMemory').classList.remove('hidden');}
     }));
-    const picker=document.getElementById('photoPick');
-    if(picker) picker.addEventListener('change',e=>{const file=e.target.files&&e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=ev=>{extraPhotos[m.key]=ev.target.result;renderMemory();};reader.readAsDataURL(file)});
     document.getElementById('nextMemory').addEventListener('click',()=>{window.scrollTo({top:0,behavior:'smooth'});if(step<3){step++;renderMemory()}else{step=4;renderFinal()}});
   }
 
